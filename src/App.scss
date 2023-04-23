@@ -5,7 +5,7 @@
   font-family: sans-serif;
 }
 
-body, .App {
+body {
   display: flex;
   flex-flow: column;
   justify-content: center;
@@ -13,19 +13,19 @@ body, .App {
   width: 100vw;
   height: 100vh;
 }
-
 .App {
+  @extend body;
   text-align: center;
 }
-
 hr {
   width: 30%;
   margin: 1vh;
 }
-
 ol {
   text-align: left;
+  li {
+    span {
+      padding: 0 0 0 3px;
+    }
+  }
 }
-ol li span {
-  padding: 0 0 0 3px;
-}/*# sourceMappingURL=App.css.map */
