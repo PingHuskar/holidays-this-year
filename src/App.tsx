@@ -12,6 +12,10 @@ const dicts = (name: string, lang: string, num: number) => {
       return lang === "en" ? `${num-1} days ago` : `${num-1} วันที่ผ่านมา`
     case `nextxdays`:
       return lang === "en" ? `coming in ${Math.abs(num)+1} days` : `จะถึงในอีก ${Math.abs(num)+1} วัน`
+    case `title`:
+      return lang === "en" ? `Holiday in Thailand` : `วันหยุดไทย`
+    case `listStyleType`:
+      return lang === "en" ? `` : `thai`
     default:
       return ``
   }
@@ -29,20 +33,31 @@ const ThaiHolidaysDict: any = {
   "Asalha Puja": `วันอาสาฬหบูชา`,
   "Buddhist Lent": `วันเข้าพรรษา`,
   "The Queen Mother's Birthday": `วันเฉลิมพระชนมพรรษา สมเด็จพระนางเจ้าสิริกิติ์ พระบรมราชินีนาถ พระบรมราชชนนีพันปีหลวง`,
-  "King Bhumibol Adulyadej Memorial Day": `วันคล้ายวันสวรรคต พระบาทสมเด็จพระปรมินทรมหาภูมิพลอดุลยเดช บรมนาถรบพิตร`,
+  "King Bhumibol Adulyadej Memorial Day": `วันคล้ายวันสวรรคต พระบาทสมเด็จพระบรมชนกาธิเบศร มหาภูมิพลอดุลยเดชมหาราช บรมนาถบพิตร`,
   "King Chulalongkorn Day": `วันปิยมหาราช`,
-  "King Bhumibol Adulyadej's Birthday": `วันคล้ายวันพระราชสมภพของพระบาทสมเด็จพระบรม ชนกาธิเบศร มหาภูมิพลอดุลยเดชมหาราช บรมนาถบพิตร`,
+  "King Bhumibol Adulyadej's Birthday": `วันคล้ายวันพระราชสมภพของพระบาทสมเด็จพระบรมชนกาธิเบศร มหาภูมิพลอดุลยเดชมหาราช บรมนาถบพิตร และวันพ่อแห่งชาติ`,
   "Constitution Day": `วันรัฐธรรมนูญ`,
   "New Year's Eve": `วันสิ้นปี`,
+  "Labour Day": `วันแรงงานแห่งชาติ`,
 }
+
 
 function App() {
   const [lang, setLang] = useState(localStorage.getItem(`lang`) || `th`)
   const hd = new Holidays(`TH`)
   const TODAYDATE = moment(new Date())
+  const z = hd.getHolidays()
+  z.push({
+    "date": `${moment().format('Y')}-05-01 00:00:00`,
+    "start": new Date(`${moment().format('Y')}-05-01T17:00:00.000Z`),
+    "end": new Date(`${moment().format('Y')}-05-02T17:00:00.000Z`),
+    "name": "Labour Day",
+    "type": "public",
+    "rule": "05-01"
+  })
   return (
     <div className="App">
-      <h1>Holiday In {`TH`} {moment().format('Y')}</h1>
+      <h1>{dicts(`title`,lang,0)} {moment().format('Y')}</h1>
       <h2>Time Zone: {hd.getTimezones()}</h2>
       <h2>Language: {hd.getLanguages().map((l,i)=> {
         const ll: string = l.toLocaleLowerCase()
@@ -59,9 +74,10 @@ function App() {
       })}</h2>
       <hr />
       <ol>
-        {hd.getHolidays().map((d,i)=> {
+        {z.sort((a,b) => (a.rule > b.rule) ? 1 : ((b.rule > a.rule) ? -1 : 0))
+        .map((d,i)=> {
           const daysago = parseInt(moment.duration(TODAYDATE.diff(d.start)).asDays().toFixed(0))
-          return <li key={i}>
+          return <li style={{listStyleType: dicts(`listStyleType`,lang,0)}} key={i}>
             <span>
               {lang === `th` ? ThaiHolidaysDict[d.name] : d.name}
             </span>
