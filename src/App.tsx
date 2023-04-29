@@ -2,10 +2,12 @@ import { useState } from 'react'
 import Holidays from 'date-holidays'
 import './App.css'
 import moment from 'moment'
+
 const months: any = {
   "en": ["January","February","March","April","May","June","July","August","September","October","November","December"],
   "th": [ "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"],
 }
+
 const dicts = (name: string, lang: string, num: number) => {
   switch (name) {
     case `daysago`:
@@ -41,20 +43,27 @@ const ThaiHolidaysDict: any = {
   "Labour Day": `วันแรงงานแห่งชาติ`,
 }
 
+const extendHoliday = [
+  {"name": `Labour Day`, "rule": `05-01`, "prev": `04-30`},
+]
 
+const hd = new Holidays(`TH`)
+const TODAYDATE = moment(new Date())
+const thisYear = moment().format('Y')
+const z = hd.getHolidays(parseInt(thisYear))
+for (let exh of extendHoliday) {
+  z.push({
+    "date": `${thisYear}-${exh.rule} 00:00:00`,
+    "start": new Date(`${thisYear}-${exh.prev}T17:00:00.000Z`),
+    "end": new Date(`${thisYear}-${exh.rule}T17:00:00.000Z`),
+    "name": `${exh.name}`,
+    "type": "public",
+    "rule": `${exh.rule}`
+  })
+}
+// console.log(z.sort((a,b) => (a.rule > b.rule) ? 1 : ((b.rule > a.rule) ? -1 : 0)))
 function App() {
   const [lang, setLang] = useState(localStorage.getItem(`lang`) || `th`)
-  const hd = new Holidays(`TH`)
-  const TODAYDATE = moment(new Date())
-  const z = hd.getHolidays()
-  z.push({
-    "date": `${moment().format('Y')}-05-01 00:00:00`,
-    "start": new Date(`${moment().format('Y')}-05-01T17:00:00.000Z`),
-    "end": new Date(`${moment().format('Y')}-05-02T17:00:00.000Z`),
-    "name": "Labour Day",
-    "type": "public",
-    "rule": "05-01"
-  })
   return (
     <div className="App">
       <h1>{dicts(`title`,lang,0)} {moment().format('Y')}</h1>
@@ -74,7 +83,7 @@ function App() {
       })}</h2>
       <hr />
       <ol>
-        {z.sort((a,b) => (a.rule > b.rule) ? 1 : ((b.rule > a.rule) ? -1 : 0))
+        {z.sort((a,b) => (a.date > b.date) ? 1 : ((b.date > a.date) ? -1 : 0))
         .map((d,i)=> {
           const daysago = parseInt(moment.duration(TODAYDATE.diff(d.start)).asDays().toFixed(0))
           return <li style={{listStyleType: dicts(`listStyleType`,lang,0)}} key={i}>
