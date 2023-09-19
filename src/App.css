@@ -28,4 +28,8 @@ ol {
 }
 ol li span {
   padding: 0 0 0 3px;
+}
+
+.pointer {
+  cursor: pointer;
 }/*# sourceMappingURL=App.css.map */
